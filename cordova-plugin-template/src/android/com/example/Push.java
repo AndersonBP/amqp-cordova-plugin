@@ -10,19 +10,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.amqp.notification.PushNotification;
-import org.amqp.notification.PushManager;
-
 public class Push extends CordovaPlugin {
 	
 	private static CallbackContext clbContext;
-	private PushManager manager;
-	
+
 	public static final String TAG = "Push";
 
 	public static final String ACTION_INITIALIZE = "initialize";
@@ -32,21 +29,32 @@ public class Push extends CordovaPlugin {
 		try {
 			clbContext = callbackContext;
 
-			this.manager = new PushManager(cordova.getActivity(), this);
+			if(action.equals("initialize")){
+				Activity activity = cordova.getActivity();
 
-			clbContext.success("Iniciou");
-			return true;
+				Intent intent = new Intent( activity, NotificationService.class);
+				activity.startService(intent);
 
+				clbContext.success();
+			}
 		} catch (Exception e) {
 			clbContext.error(e.getMessage());
-		} finally {
-			return false;
+		}
+
+		return true;
+	}
+
+	public static void proceedNotification(String message) {
+		try {
+			clbContext.success(message);
+		} catch (Exception e) {
+			clbContext.error(e.getMessage());
 		}
 	}
 
-	public static void proceedNotification(PushNotification extras) {
+	public static void proceedError(String error){
 		try {
-			clbContext.success(extras.toString());
+			clbContext.error(error);
 		} catch (Exception e) {
 			clbContext.error(e.getMessage());
 		}

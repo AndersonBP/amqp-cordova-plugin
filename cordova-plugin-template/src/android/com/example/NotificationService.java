@@ -12,108 +12,76 @@ import java.lang.Runnable;
 import java.lang.Thread;
 import java.lang.Exception;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.QueueingConsumer;
-import com.rabbitmq.client.QueueingConsumer.Delivery;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.AMQP;
 
-import org.amqp.notification.PushReceiver;
-
+import org.amqp.notification.Push;
 
 public class NotificationService extends Service{
-    
-    protected Thread amqpThread;
-    
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         proceed(); 
         return START_REDELIVER_INTENT;
-		
-		// must be able to get the intent
-		// because in the first intent there are the connexion and user information.
-		// what is the solution to stop the servi   ce without calling stop self
     }
-    
-    //The thread listen to rabbit MQ
-    //Received message are broadcasted
-    //The message are proccessed in the PushManager and send to the view there.
+
     protected void proceed() {
 
-		amqpThread = new Thread(new Runnable() {
+		new Thread(new Runnable() {
+
+			@Override
             public void run() {
+
 				try {
 					ConnectionFactory factory = new ConnectionFactory();
-
-					Log.e("IN TREADDDDDDDDDDDDDDDDDDDDDDDDDDDD", "THREADDD");
 
 					factory.setHost("192.168.15.3");
 					factory.setUsername("macho");
 					factory.setPassword("macho");
 					factory.setPort(5672);
+					factory.setVirtualHost("/");
 
 					Connection connection = factory.newConnection();
-					final Channel channel = connection.createChannel();
-					//#
-					
-					//#QUEUE DECLARATION
-					//the queue is a pile that dispatch message between worker
-					//if two queues have the same name, then the message will be ballanced between the queue 
-					//when we define a routingKey, the purpose migth be to corresponding queue
-					//or to use a specific mapping, for instance in the direct messaging.
-					//The choice we have to examine, is declaring a single queue for all the application
-					//or declaring a new queue for each application
-					//if i declare a single queue, it can be reload on and on again when restarting the notification service, 
-					String queueName = "NotificationQueue";
-					boolean durable = false; // if the rabbitMQ server stops, the queue is stile available
-					boolean exclusive = false; //the queue can be consume by other connexion, not dedicated to that connection only.
-					boolean autoDelete = false; //the queue must not be deleted, because it miht be use eventually by other apps
-					channel.queueDeclare(queueName, durable, exclusive, autoDelete, null);
+					Channel channel = connection.createChannel();
+
+					String queue = "queue-name";
+					String exchange = "exchange-name";
+
+					channel.queueDeclare(queue, true, false, false, null);
+					channel.exchangeDeclare(exchange, "direct", true);
+					channel.queueBind(queue, exchange, queue);
+
 					QueueingConsumer consumer = new QueueingConsumer(channel);
+					channel.basicConsume(queue, true, consumer);
 
-					String exchangeName = "NotificationExchange";
-					String exchangeType = "direct";
-					
-					channel.exchangeDeclare(exchangeName, exchangeType,durable, autoDelete, null);
-					
-					channel.queueBind(queueName, exchangeName, "ionic" ); //bind the queue with the exchange
-					
-					boolean autoAck = false;
+					// Process deliveries
+					while (true) {
 
-					channel.basicConsume(queueName, autoAck, "myConsumerTag", new DefaultConsumer(channel) {
-						@Override
-						public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,  byte[] body) throws IOException {
-							 String routingKey = envelope.getRoutingKey();
-							 long deliveryTag = envelope.getDeliveryTag();
-							 String message = new String(body);
-							 Intent intent = new Intent();
-							 intent.setAction(PushReceiver.PUSH_INTENT_ACTION);
-							 intent.putExtra(PushReceiver.PUSH_INTENT_EXTRA, message); 
-							 sendBroadcast(intent);
+						QueueingConsumer.Delivery delivery = consumer.nextDelivery();
 
-							 channel.basicAck(deliveryTag, false);							 
-						}
-					});
+						String message = new String(delivery.getBody(), "UTF-7");
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+						Push.proceedNotification(message);
+					}
+				} catch (Exception e) { }
 			}
-        });
-		
-        amqpThread.start();
-    
+        }).start();
     }
-    //broadcast an error message if the service is unable to connext.
-    //ferme le service must be able to restart after connection fail.
-    @Override
+
+	final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+	@Override
     public void onDestroy(){
-        amqpThread = null; //We destroy the thread.
         super.onDestroy();   
     }
 
@@ -129,16 +97,7 @@ public class NotificationService extends Service{
         }
     }
 
-    /**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
-
-    /**
-     * When binding to the service, we return an interface to our messenger
-     * for sending messages to the service.
-     */
-    @Override
+	@Override
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
     }

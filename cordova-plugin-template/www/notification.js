@@ -2,8 +2,11 @@ var exec = require('cordova/exec');
 
 var Push = {
 		
-	Listen: function(success, failure, config) {
+	Start: function(success, failure, config) {
         exec(success, failure, 'Push', 'initialize', [config]);
+    },
+    Next: function(success, failure, config) {
+        exec(success, failure, 'Push', 'next', [config]);
     }
 };
 

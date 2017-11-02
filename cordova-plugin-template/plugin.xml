@@ -11,44 +11,34 @@
     <issue>https://github.com/driftyco/cordova-plugin-template/issues</issue>
 
 	<engines>
-		<engine name="cordova" version=">=4.0.0" />
+    <engine name="cordova" version=">=4.0.0" />
 	</engines>	
 
 	<!-- android -->
     <platform name="android">
 
-	  <js-module src="www/notification.js" name="Push">
-		<runs/>
-		<clobbers target="Push" />
-	  </js-module>
+        <js-module src="www/notification.js" name="Push">
+            <runs/>
+            <clobbers target="Push" />
+        </js-module>
 
-      <config-file target="res/xml/config.xml" parent="/*">
-        <feature name="Push">
-          <param name="android-package" value="org.amqp.notification.Push" />
-        </feature>
-      </config-file>
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Push">
+                <param name="android-package" value="org.amqp.notification.Push" />
+            </feature>
+        </config-file>
 
-	  <lib-file src="src/android/com/example/amqp-client.jar" />
-	  
-	  <config-file target="AndroidManifest.xml" parent="/*">
-		  <uses-permission android:name="android.permission.INTERNET" />
-	  </config-file>
-	  
-	  <source-file src="src/android/com/example/PushNotification.java" target-dir="src/com/example/" />
-	  <source-file src="src/android/com/example/Push.java" target-dir="src/com/example/" />
-	  <source-file src="src/android/com/example/NotificationService.java" target-dir="src/com/example/" />
-	  <source-file src="src/android/com/example/PushReceiver.java" target-dir="src/com/example/" />
-	  <source-file src="src/android/com/example/PushManager.java" target-dir="src/com/example/" />
-	  
-	  <config-file target="AndroidManifest.xml" parent="/manifest/application">
-        <service android:name="org.amqp.notification.PushService"></service>
+        <lib-file src="src/android/com/example/amqp-client.jar" />
+        
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
+        </config-file>
+        
+        <source-file src="src/android/com/example/Push.java" target-dir="src/com/example/" />
+        <source-file src="src/android/com/example/NotificationService.java" target-dir="src/com/example/" />
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
         <service android:name="org.amqp.notification.NotificationService"></service>
-        <receiver android:name="org.amqp.notification.PushReceiver" android:permission="com.google.android.c2dm.permission.SEND">
-			<intent-filter>
-			  <action android:name="org.amqp.notification.action"/>
-			</intent-filter>
-        </receiver>
-      </config-file>
+        </config-file>
     </platform>
-
 </plugin>
