@@ -14,4 +14,3 @@ var Push = {
 window.Push = Push;
 
 module.exports = Push;
-    

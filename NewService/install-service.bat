@@ -1,3 +1,3 @@
 @echo off
 
-cordova plugin add ../cordova-plugin-template --link
+cordova plugin add ../rabbitmq-cordova-client --link

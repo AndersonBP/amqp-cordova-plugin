@@ -1,3 +1,3 @@
 @echo off
 
-cordova plugin rm my-cordova-plugin
+cordova plugin rm rabbitmq-cordova-client

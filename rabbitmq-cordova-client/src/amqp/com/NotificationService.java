@@ -46,8 +46,8 @@ public class NotificationService extends Service{
 					ConnectionFactory factory = new ConnectionFactory();
 
 					factory.setHost("192.168.15.3");
-					factory.setUsername("macho");
-					factory.setPassword("macho");
+					factory.setUsername("cordova");
+					factory.setPassword("cordova");
 					factory.setPort(5672);
 					factory.setVirtualHost("/");
 

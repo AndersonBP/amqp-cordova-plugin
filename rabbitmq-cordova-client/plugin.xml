@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="my-cordova-plugin"
+    id="rabbitmq-cordova-client"
     version="1.0.0">
-    <name>Cordova Plugin Template</name>
+    <name>RabbitMQ cordova client</name>
     <description></description>
     <license>MIT</license>
     <keywords></keywords>
-    <repo>https://github.com/driftyco/cordova-plugin-template.git</repo>
-    <issue>https://github.com/driftyco/cordova-plugin-template/issues</issue>
 
 	<engines>
-    <engine name="cordova" version=">=4.0.0" />
+        <engine name="cordova" version=">=4.0.0" />
 	</engines>	
 
 	<!-- android -->
@@ -28,17 +26,17 @@
             </feature>
         </config-file>
 
-        <lib-file src="src/android/com/example/amqp-client.jar" />
+        <lib-file src="src/amqp/lib/amqp-client.jar" />
+        
+        <source-file src="src/amqp/com/Push.java" target-dir="src/com/amqp/com/" />
+        <source-file src="src/amqp/com/NotificationService.java" target-dir="src/amqp/com/" />
         
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET" />
         </config-file>
-        
-        <source-file src="src/android/com/example/Push.java" target-dir="src/com/example/" />
-        <source-file src="src/android/com/example/NotificationService.java" target-dir="src/com/example/" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-        <service android:name="org.amqp.notification.NotificationService"></service>
+            <service android:name="org.amqp.notification.NotificationService"></service>
         </config-file>
     </platform>
 </plugin>

@@ -1,0 +1,11 @@
+{
+    "name": "rabbitmq-cordova-client",
+    "version": "1.0.0",
+    "cordova": {
+        "id": "rabbitmq-cordova-client",
+        "platforms": [
+            "android"
+        ]
+    },
+    "description": "A rabbitMQ simple cordova client"
+}
