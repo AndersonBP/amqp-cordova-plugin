@@ -22,21 +22,38 @@
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Push">
-                <param name="android-package" value="org.amqp.notification.Push" />
-            </feature>
+                <param name="android-package" value="org.amqp.notification.Push" />                
+            </feature>            
         </config-file>
 
         <lib-file src="src/amqp/lib/amqp-client.jar" />
         
         <source-file src="src/amqp/com/Push.java" target-dir="src/com/amqp/com/" />
         <source-file src="src/amqp/com/NotificationService.java" target-dir="src/amqp/com/" />
+        <source-file src="src/amqp/com/StartNotificationReceiver.java" target-dir="src/amqp/com/" />
+        <source-file src="src/amqp/com/Configuration.java" target-dir="src/amqp/com/" />
+        <source-file src="src/amqp/com/ConfigurationFileService.java" target-dir="src/amqp/com/" />
         
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+            
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="org.amqp.notification.NotificationService"></service>
+           <receiver android:name="org.amqp.notification.StartNotificationReceiver">
+               <intent-filter>
+                  <action android:name="intent.action.START_SERVICE" />
+                  <category android:name="android.intent.category.DEFAULT" />
+               </intent-filter>
+            </receiver>
         </config-file>
     </platform>
 </plugin>

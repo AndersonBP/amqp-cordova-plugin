@@ -5,9 +5,13 @@ var Push = {
 	Start: function(success, failure, config) {
         exec(success, failure, 'Push', 'initialize', [config]);
     },
-    Next: function(success, failure, config) {
-        exec(success, failure, 'Push', 'next', [config]);
+    SaveConfigs: function(success, failure, config) {
+        exec(success, failure, 'Push', 'saveConfigs', [config]);
+    },
+    ClearConfigs: function(success, failure, config) {
+        exec(success, failure, 'Push', 'clearConfigs', [config]);
     }
+    
 };
 
 /* @Deprecated */
